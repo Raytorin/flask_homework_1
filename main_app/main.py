@@ -23,8 +23,9 @@ def hash_password(password: str):
 def validate(json_data, model_class):
     try:
         model_item = model_class(**json_data)
+        raise HttpError(400, message=f'{json_data} gggggggggggg {model_item}')
         # return model_item.model_dump(exclude_none=True)
-        return model_item.dict(exclude_none=True)
+        # return model_item.dict(exclude_none=True)
     except ValidationError as err:
         raise HttpError(400, err.errors())
 
@@ -89,7 +90,8 @@ class UserView(MethodView):
             })
 
     def post(self):
-        json_data = validate(request.json, PostUser)
+        json_data = request.json
+        # json_data = validate(request.json, PostUser)
         json_data['user_password'] = hash_password(json_data['user_password'])
         with Session() as session:
             new_user = User(**json_data)
@@ -103,7 +105,8 @@ class UserView(MethodView):
             })
 
     def patch(self, user_id: int):
-        json_data = validate(request.json, PatchUser)
+        json_data = request.json
+        # json_data = validate(request.json, PatchUser)
         if 'user_password' in json_data:
             json_data['user_password'] = hash_password(json_data['user_password'])
 
@@ -146,7 +149,8 @@ class AdvView(MethodView):
 
     def post(self):
         user_auth = authentication(request)
-        json_data = validate(request.json, PostAdv)
+        json_data = request.json
+        # json_data = validate(json_old_data, PostAdv)
         json_data['owner_id'] = user_auth.id
         with Session() as session:
             new_adv = Advertisement(**json_data)
@@ -161,7 +165,8 @@ class AdvView(MethodView):
 
     def patch(self, adv_id: int):
         user_auth = authentication(request)
-        json_data = validate(request.json, PatchAdv)
+        json_data = request.json
+        # json_data = validate(request.json, PatchAdv)
         json_data['owner_id'] = user_auth.id
         with Session() as session:
             result = session.query(User).join(Advertisement).filter(
@@ -171,7 +176,7 @@ class AdvView(MethodView):
         if not result:
             raise HttpError(404, message='you cannot interact with this ad')
         with Session() as session:
-            adv = get_adv(adv_id_id, session)
+            adv = get_adv(adv_id, session)
             for field, value in json_data.items():
                 setattr(adv, field, value)
             try:
@@ -187,6 +192,7 @@ class AdvView(MethodView):
             })
 
     def delete(self, adv_id: int):
+        user_auth = authentication(request)
         with Session() as session:
             adv = get_adv(adv_id, session)
             session.delete(adv)

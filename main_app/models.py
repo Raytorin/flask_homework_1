@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, ForeignKey
 from sqlalchemy.orm import sessionmaker, relationship, declarative_base
 from sqlalchemy import Column, Integer, String, DateTime, func
 
-engine = create_engine('postgresql://postgres:postgres_pwd@postgredb:5432/netology_flask')
+engine = create_engine('postgresql://postgres:postgres_pwd@postgredb:5432/netology_flask', encoding='utf8')
 Session = sessionmaker(bind=engine)
 
 Base = declarative_base(bind=engine)

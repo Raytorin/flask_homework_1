@@ -75,15 +75,16 @@ class PostAdv(pydantic.BaseModel):
     title: str
     description: str
 
-    # @pydantic.field_validator('title')
-    # def validate_title(ctl, value):
-    #     _check_text_len(str(value), 90, 2, 'title')
-    #     return value
+    @pydantic.field_validator('title')
+    def validate_title(ctl, value):
+        # _check_text_len(str(value), 90, 2, 'title')
+        return value
     #
-    # @pydantic.field_validator('description')
-    # def validate_description(ctl, value):
-    #     _check_text_len(str(value), 300, 2, 'description')
-    #     return value
+
+    @pydantic.field_validator('description')
+    def validate_description(ctl, value):
+        # _check_text_len(str(value), 300, 2, 'description')
+        return value
 
 
 class PatchAdv(pydantic.BaseModel):
