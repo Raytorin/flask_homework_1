@@ -1,5 +1,6 @@
 import pydantic
 from typing import Optional
+from pydantic import v1 as pydantic_v1
 import re
 
 
@@ -13,7 +14,7 @@ def _check_email(email):
 
 def _check_text_len(text, max_len, min_len, element_check):
     if len(text) > max_len or len(text) < min_len:
-        raise ValueError(f'the {element_check} does not meet the length requirements')
+        raise ValueError(f'the {element_check} does not meet the length requirements: {len(text)} > {max_len} or < {min_len}')
 
 
 def _check_password(password):
@@ -32,21 +33,21 @@ class PostUser(pydantic.BaseModel):
     user_password: str
     user_email: str
 
-    @pydantic.field_validator('user_name')
+    @pydantic_v1.validator('user_name')
     def validate_username(cls, value):
         if not value.isalpha():
             raise ValueError('the name must contain only letters')
         return value
 
-    @pydantic.field_validator('user_password')
+    @pydantic_v1.validator('user_password')
     def validate_password(cls, value):
         _check_password(value)
         return value
 
-    # @pydantic.field_validator('user_email')
-    # def validate_email(ctl, value):
-    #     _check_email(value)
-    #     return value
+    @pydantic_v1.validator('user_email')
+    def validate_email(ctl, value):
+        _check_email(value)
+        return value
 
 
 class PatchUser(pydantic.BaseModel):
@@ -54,36 +55,35 @@ class PatchUser(pydantic.BaseModel):
     user_password: Optional[str]
     user_email: Optional[str]
 
-    @pydantic.field_validator('user_name')
+    @pydantic_v1.validator('user_name')
     def validate_username(cls, value):
         if not value.isalpha():
             raise ValueError('the name must contain only letters')
         return value
 
-    @pydantic.field_validator('user_password')
+    @pydantic_v1.validator('user_password')
     def validate_password(cls, value):
         _check_password(value)
         return value
 
-    # @pydantic.field_validator('user_email')
-    # def validate_email(ctl, value):
-    #     _check_email(value)
-    #     return value
+    @pydantic_v1.validator('user_email')
+    def validate_email(ctl, value):
+        _check_email(value)
+        return value
 
 
 class PostAdv(pydantic.BaseModel):
     title: str
     description: str
 
-    @pydantic.field_validator('title')
+    @pydantic_v1.validator('title')
     def validate_title(ctl, value):
-        # _check_text_len(str(value), 90, 2, 'title')
+        _check_text_len(str(value), 300, 2, 'title')
         return value
-    #
 
-    @pydantic.field_validator('description')
+    @pydantic_v1.validator('description')
     def validate_description(ctl, value):
-        # _check_text_len(str(value), 300, 2, 'description')
+        _check_text_len(str(value), 500, 2, 'description')
         return value
 
 
@@ -91,12 +91,12 @@ class PatchAdv(pydantic.BaseModel):
     title: Optional[str]
     description: Optional[str]
 
-    @pydantic.field_validator('title')
+    @pydantic_v1.validator('title')
     def validate_title(ctl, value):
-        _check_text_len(str(value), 8, 50, 'title')
+        _check_text_len(str(value), 300, 2, 'title')
         return value
 
-    @pydantic.field_validator('description')
+    @pydantic_v1.validator('description')
     def validate_description(ctl, value):
-        _check_text_len(str(value), 10, 300, 'description')
+        _check_text_len(str(value), 500, 2, 'description')
         return value
